@@ -46,9 +46,7 @@ public class MainActivity extends AppCompatActivity {
         getdata.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-             viewModel.deleteAllUsers();
-
+              viewModel.deleteAllUsers();
             }
         });
         loginbutton.setOnClickListener(new View.OnClickListener() {
