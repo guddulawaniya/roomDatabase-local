@@ -1,10 +1,11 @@
 package com.example.livedata;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
@@ -12,18 +13,21 @@ import java.util.List;
 public interface UserDao {
 
 
-    @Query("SELECT * FROM user")
-    List<User> getAll();
-    @Query("SELECT * FROM user where uid= :id")
-        User findone_record(int id);
-    @Query("SELECT * FROM user WHERE uid IN (:userIds)")
-    List<User> loadAllByIds(int[] userIds);
+    @Query("SELECT * FROM logindata")
+    LiveData<List<User>> getAlldata();
 
-    @Query("SELECT * FROM user WHERE first_name LIKE :first AND " +
-            "last_name LIKE :last LIMIT 1")
-    User findByName(String first, String last);
+    @Query("SELECT * FROM logindata where id= :id")
+    User find_record(int id);
+
     @Insert
-    void insertAll(User... users);
+    void insert(User users);
+    @Update
+    void update(User user);
+
     @Delete
     void delete(User user);
+
+    @Query("DELETE FROM logindata")
+    void deleteAllUsers();
+
 }

@@ -8,17 +8,17 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    int i = 3;
-    UserDao userDao;
 
-    private List<User> users = new ArrayList<>();
+    private userViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,34 +28,41 @@ public class MainActivity extends AppCompatActivity {
         EditText emailaddress = findViewById(R.id.emailaddress);
         EditText password = findViewById(R.id.password);
         Button loginbutton = findViewById(R.id.loginbutton);
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "database-name").allowMainThreadQueries().build();
-        userDao = db.userDao();
-        users = userDao.getAll();
+        Button getdata = findViewById(R.id.getdata);
+        RecyclerView recyclerview = findViewById(R.id.recyclerview);
+        recyclerview.setLayoutManager(new LinearLayoutManager(this));
 
 
-        for (User task : users) {
-            Toast.makeText(this, "id : "+task.uid+"\nfirstname: " + task.firstName+"\nlastname : "+task.lastName, Toast.LENGTH_SHORT).show();
-            // Process each task
-        }
-
-
-        loginbutton.setOnClickListener(new View.OnClickListener() {
+        viewModel = new ViewModelProvider(this, (ViewModelProvider.Factory) ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication())).get(userViewModel.class);
+        viewModel.getLiveData().observe(this, new Observer<List<User>>() {
             @Override
-            public void onClick(View view) {
-                String names = name.getText().toString();
-                String email = emailaddress.getText().toString();
-                String passwords = password.getText().toString();
-                User users = new User();
+            public void onChanged(List<User> users) {
+                myAdapter adapter = new myAdapter(users);
+                recyclerview.setAdapter(adapter);
 
-                users.uid = ++i;
-                users.firstName = names;
-                users.lastName = email;
-                userDao.insertAll(users);
-                users =   userDao.findone_record(i);
-                Toast.makeText(MainActivity.this, "users"+users.firstName, Toast.LENGTH_SHORT).show();
 
             }
         });
+        getdata.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+             viewModel.deleteAllUsers();
+
+            }
+        });
+        loginbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!name.getText().toString().isEmpty() && !emailaddress.getText().toString().isEmpty() && !password.getText().toString().isEmpty()) {
+
+                    User user = new User(name.getText().toString(), emailaddress.getText().toString(), password.getText().toString());
+
+                    viewModel.insert(user);
+                }
+            }
+        });
+
+
     }
 }
