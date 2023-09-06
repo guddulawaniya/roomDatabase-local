@@ -31,7 +31,7 @@ public class myAdapter extends RecyclerView.Adapter<myAdapter.viewholder> {
     public void onBindViewHolder(@NonNull myAdapter.viewholder holder, int position) {
 
         User module = list.get(position);
-        holder.name.setText(module.firstName);
+        holder.name.setText(module.getFirstName());
         holder.emailaddress.setText(module.getEmailid());
         holder.password.setText(module.getPassword());
 
